@@ -18,7 +18,7 @@ const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({secret: '', resave: false, saveUninitialized: false}));
+app.use(session({secret: 'my secret', resave: false, saveUninitialized: false}));
 
 app.use((req, res, next) => { 
   User.findById("5f967670af2d7704d8604c22")
