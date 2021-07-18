@@ -21,7 +21,7 @@ exports.getLogin = (req, res, next) => {
     User.findOne({email: email})
     .then(user=>{
       if(!user){
-        req.flash('error', 'Invalid email or password.');
+        req.flash('error', 'Invalid email please signup first');
         return res.redirect('/login');
       }
       bcrypt.compare(password, user.password)
@@ -33,6 +33,7 @@ exports.getLogin = (req, res, next) => {
              res.redirect('/');
           })
         }
+        req.flash('error', 'Invalid password please try again');
         res.redirect('/login');
       })
       .catch(err=>{
