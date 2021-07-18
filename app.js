@@ -8,6 +8,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
+const flash = require('connect-flash');
 
 const MONGODB_URI = 'mongodb://ahmad1:p2K6S5mmpktG4KfI@cluster0-shard-00-00.xmre6.mongodb.net:27017,cluster0-shard-00-01.xmre6.mongodb.net:27017,cluster0-shard-00-02.xmre6.mongodb.net:27017/shop?ssl=true&replicaSet=atlas-9tacbu-shard-0&authSource=admin&retryWrites=true&w=majority';
 
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({secret: 'my secret', resave: false, saveUninitialized: false, store: store}));
 
 app.use(csrfProtection);
+app.use(flash());
 
 app.use((req, res, next) => { 
   if(!req.session.user){
