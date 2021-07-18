@@ -71,6 +71,22 @@ form {
   color: #ffeb3b;
 }
 
+.user-message{
+  margin: auto;
+  width: 25%;
+  padding: 0.5rem;
+  border-radius: 3px;
+  border: 1px solid #4771fa;
+  background: #8ea8fd;
+  text-align: center;
+} 
+
+.user-message--error{
+  border-color: red;
+  background: rgb(250, 165, 155);
+  color: red;
+}
+
 .mobile-nav {
   width: 30rem;
   height: 100vh;
