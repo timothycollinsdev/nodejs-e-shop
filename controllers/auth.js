@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false
     }
-  });
+});
 
 exports.getLogin = (req, res, next) => {
         let message = req.flash('error');
