@@ -3,6 +3,20 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const nodemailer = require("nodemailer");
 
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  service: "Gmail",
+  port: 25,
+  secure: false,
+  auth: {
+  user: '', //Enter your mail here
+  pass: '' //Enter your password here
+  },
+  tls: {
+    rejectUnauthorized: false
+    }
+  });
+
 exports.getLogin = (req, res, next) => {
         let message = req.flash('error');
         if(message.length > 0){
@@ -87,19 +101,6 @@ exports.postSignup = (req, res, next) => {
       })
       .then(result=>{
         res.redirect('/login');
-        const transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
-             service: "Gmail",
-             port: 25,
-             secure: false,
-             auth: {
-              user: '', //Enter your mail here
-              pass: '' //Enter your password here
-             },
-             tls: {
-                 rejectUnauthorized: false
-             }
-        });
         return transporter.sendMail({
           to: email,
           subject: 'Signup Completed!!',
@@ -140,6 +141,15 @@ exports.postReset = (req, res, next) =>{
       user.resetToken = token;
       user.resetTokenExpiration= Date.now()+3600000;
       return user.save();
-    }).catch(err=>console.log(err));
+    })
+    .then(res=>{
+      res.redirect('/');
+      transporter.sendMail({
+        to: req.body.email,
+        subject: 'Password Reset',
+        html: `<p>Password reset request</p><p>Here is your password reset <a href="https://localhost:3000/reset/${token}">link</a></p>`
+      });
+    })
+    .catch(err=>console.log(err));
   });
   };
