@@ -22,7 +22,13 @@ router.post('/signup',
         }
         return true;
     }),
-    body('password','Please enter a password with 5 numbers').isLength({min:5}).isAlphanumeric()   
+    body('password','Please enter a password with 5 numbers').isLength({min:5}).isAlphanumeric(),
+    body('confirmpassword').custom((value,{req}) =>{
+        if(value !== req.body.password){
+            throw new Error('Password does not match!')
+        }
+        return true;
+    })
 ], authController.postSignup);
 
 router.get('/reset', authController.getReset);
