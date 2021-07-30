@@ -2,21 +2,14 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs'); 
 const crypto = require('crypto');
 const nodemailer = require("nodemailer");
+const sendGridTransport = require('nodemailer-sendgrid-transport');
 const {validationResult} = require('express-validator')
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  service: "Gmail",
-  port: 25,
-  secure: false,
+const transporter = nodemailer.createTransport(sendGridTransport({
   auth: {
-  user: '', //Enter your mail here
-  pass: '' //Enter your password here
-  },
-  tls: {
-    rejectUnauthorized: false
-    }
-});
+    api_key: '' //Add your API key
+  }
+}));
 
 exports.getLogin = (req, res, next) => {
         let message = req.flash('error');
@@ -112,6 +105,7 @@ exports.postSignup = (req, res, next) => {
         res.redirect('/login');
         return transporter.sendMail({
           to: email,
+          from: 'Sulemanbhatti.business@gmail.com',
           subject: 'Signup Completed!!',
           html: '<h1>Congrats, You are signed up!</h1>'
         });
@@ -155,6 +149,7 @@ exports.postReset = (req, res, next) =>{
       res.redirect('/');
       transporter.sendMail({
         to: req.body.email,
+        from: 'Sulemanbhatti.business@gmail.com',
         subject: 'Password Reset',
         html: `<p>Password reset request</p><p>Here is your password reset <a href="https://localhost:3000/reset/${token}">link</a></p>`
       });
