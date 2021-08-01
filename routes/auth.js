@@ -6,7 +6,13 @@ const authController = require('../controllers/auth');
 const router = express.Router();
 
 router.get('/login', authController.getLogin);
-router.post('/login', authController.postLogin);
+router.post('/login',
+    [
+    check('email')
+    .isEmail()
+    .withMessage('Please enter a valid email'),
+    body('password','Password is not valid or very short').isLength({min:5}).isAlphanumeric(),
+    ], authController.postLogin);
 
 router.post('/logout', authController.postLogout);
 
@@ -17,10 +23,6 @@ router.post('/signup',
     .isEmail()
     .withMessage('Please enter a valid email')
     .custom((value,{req})=>{
-        // if(value==='admin@admin.com'){
-        //     throw new Error('This email address is not allowed');
-        // }
-        // return true;
         return User.findOne({email: value})
         .then(userDoc =>{
           if(userDoc){
