@@ -84,7 +84,8 @@ exports.getLogin = (req, res, next) => {
         email: "", 
         password: "", 
         confirmpassword: "" 
-      }
+      },
+      validationErrors: []
     });
 };
 
@@ -101,7 +102,8 @@ exports.postSignup = (req, res, next) => {
           email: email, 
           password: password, 
           confirmpassword: req.body.confirmpassword 
-        }
+        },
+        validationErrors: errors.array()
       });
     }
      bcrypt
