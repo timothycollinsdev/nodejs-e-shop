@@ -10,8 +10,12 @@ router.post('/login',
     [
     check('email')
     .isEmail()
-    .withMessage('Please enter a valid email'),
-    body('password','Password is not valid or very short').isLength({min:5}).isAlphanumeric(),
+    .withMessage('Please enter a valid email')
+    .normalizeEmail(),
+    body('password','Password is not valid or very short')
+    .isLength({min:5})
+    .isAlphanumeric()
+    .trim()
     ], authController.postLogin);
 
 router.post('/logout', authController.postLogout);
@@ -29,9 +33,14 @@ router.post('/signup',
            return Promise.reject('Email already exists');
           }
     });
-    }),
-    body('password','Please enter a password with 5 numbers').isLength({min:5}).isAlphanumeric(),
-    body('confirmpassword').custom((value,{req}) =>{
+    }).normalizeEmail(),
+    body('password','Please enter a password with 5 numbers')
+    .isLength({min:5})
+    .isAlphanumeric()
+    .trim(),
+    body('confirmpassword')
+    .trim()
+    .custom((value,{req}) =>{
         if(value !== req.body.password){
             throw new Error('Password does not match!')
         }
