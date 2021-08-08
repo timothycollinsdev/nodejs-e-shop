@@ -7,7 +7,7 @@ const {validationResult} = require('express-validator')
 
 const transporter = nodemailer.createTransport(sendGridTransport({
   auth: {
-    api_key: '' //Add your API key
+    api_key: '' //Add your API key here
   }
 }));
 
@@ -177,7 +177,7 @@ exports.postReset = (req, res, next) =>{
     User.findOne({email: req.body.email})
     .then(user=>{
       if(!user){ 
-        req.flash('error', 'No account found with your email');
+        req.flash('error', 'No account associated with this email');
         return res.redirect('/reset');
       }
       user.resetToken = token;
