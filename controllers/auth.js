@@ -86,7 +86,11 @@ exports.getLogin = (req, res, next) => {
         res.redirect('/login');
       })
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
   }
   
   exports.postLogout = (req,res,next)=>{
@@ -151,7 +155,11 @@ exports.postSignup = (req, res, next) => {
           html: '<h1>Congrats, You are signed up!</h1>'
         });
       })
-      .catch(err=>console.log(err));
+      .catch(err=>{
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      });
 };
 
 exports.getReset = (req, res, next) =>{
@@ -193,7 +201,11 @@ exports.postReset = (req, res, next) =>{
         html: `<p>Password reset request</p><p>Here is your password reset <a href="https://localhost:3000/reset/${token}">link</a></p>`
       });
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
   });
   };
 
@@ -207,7 +219,11 @@ exports.getPassReset = (req, res, next) =>{
       userId: user._id.toString(),
       passwordToken: token
     });
-  }).catch(err=>console.log(err));
+  }).catch(err=>{
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
+  });
 }
 
 exports.postPassReset = (req, res, next) =>{
@@ -229,6 +245,10 @@ exports.postPassReset = (req, res, next) =>{
   .then(result=>{
     res.redirect('/login');
   })
-  .catch(err=>console.log(err));
+  .catch(err=>{
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
+  });
 }
 
