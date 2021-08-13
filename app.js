@@ -9,6 +9,7 @@ const csrf = require('csurf');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 const MONGODB_URI = 'mongodb://ahmad1:p2K6S5mmpktG4KfI@cluster0-shard-00-00.xmre6.mongodb.net:27017,cluster0-shard-00-01.xmre6.mongodb.net:27017,cluster0-shard-00-02.xmre6.mongodb.net:27017/shop?ssl=true&replicaSet=atlas-9tacbu-shard-0&authSource=admin&retryWrites=true&w=majority';
 
@@ -28,6 +29,7 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({dest: 'images'}).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({secret: 'my secret', resave: false, saveUninitialized: false, store: store}));
 
