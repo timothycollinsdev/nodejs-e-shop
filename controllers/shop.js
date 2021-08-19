@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const stripe = require('stripe')('sk_test_51JPn42FYfl6Xxd1eeC7uhC5fQA1E8zwgFle0q5NHezcDVwt157kT98UuPn4wRe2x8cZtHFBJ53LcPyWWyPF8W79O00Wlrb8SgR');
 
 const PDFDocument = require('pdfkit');
 
@@ -135,23 +136,37 @@ exports.postCartDeleteProduct = (req, res, next) => {
 }
 
 exports.getCheckout = (req, res, next) =>{
+  let total = 0;
+  let clientId;
   req.user
     .populate('cart.items.productId')
     .execPopulate()
     .then(user => {
        const products = user.cart.items;
-       let total = 0;
       products.forEach(p=>{
         console.log(p);
         total += p.quantity * p.productId.price;
        });
-          res.render('shop/checkout', {
-            path: '/checkout',
-            pageTitle: 'Checkout',
-            products: products,
-            totalSum: total
-          });
-        })
+      
+      stripe.paymentIntents.create({
+        amount: total * 100,
+        currency: 'usd',
+        description: 'User comes to checkout page',
+        // Verify your integration in this guide by including this parameter
+        metadata: {integration_check: 'accept_a_payment'},
+      })
+      .then(response=>{
+        clientId = response.client_secret
+        res.render('shop/checkout', {
+          path: '/checkout',
+          pageTitle: 'Checkout',
+          products: products,
+          totalSum: total,
+          client_secret: clientId
+        });
+      })
+      .catch(err=>console.log(err));
+      })
     .catch(err =>{
       const error = new Error(err);
       error.httpStatusCode = 500;
@@ -160,10 +175,15 @@ exports.getCheckout = (req, res, next) =>{
 }
 
 exports.postOrder = (req, res, next) => {
+  let totalSum = 0;
+
   req.user
     .populate('cart.items.productId')
     .execPopulate()
     .then(user => {
+      user.cart.items.forEach(p=>{
+        totalSum += p.quantity * p.productId.price;
+      });
        const products = user.cart.items.map(i=>{
          return {quantity: i.quantity, product: {...i.productId._doc}};
        }); 
@@ -177,6 +197,35 @@ exports.postOrder = (req, res, next) => {
       order.save();
       })
       .then(result => {
+        console.log('Result stripe',result)
+        const clientSecret = document.getElementById('payment-form').dataset.client_secret;
+        stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: card,
+            billing_details: {
+              email: req.user.email,
+              amount: total * 100,
+              currency: 'usd',
+              description: 'User confirms the payment',
+              // Verify your integration in this guide by including this parameter
+              metadata: {integration_check: 'accept_a_payment'},
+            },
+          }
+        }).then(function(result) {
+          if (result.error) {
+            // Show error to your customer (e.g., insufficient funds)
+            console.log(result.error.message);
+          } else {
+            // The payment has been processed!
+            if (result.paymentIntent.status === 'succeeded') {
+              // Show a success message to your customer
+              // There's a risk of the customer closing the window before callback
+              // execution. Set up a webhook or plugin to listen for the
+              // payment_intent.succeeded event that handles any business critical
+              // post-payment actions.
+            }
+          }
+        }).catch(err=>console.log(err));
       return req.user.clearCart();
     })
     .then(()=>{
