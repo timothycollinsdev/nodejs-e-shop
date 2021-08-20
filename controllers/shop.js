@@ -116,7 +116,6 @@ exports.postCart = (req, res, next) => {
      return req.user.addToCart(product);
     })
     .then(result=>{
-      // console.log(result);
       res.redirect('/cart');
   });
 };
@@ -144,7 +143,6 @@ exports.getCheckout = (req, res, next) =>{
     .then(user => {
        const products = user.cart.items;
       products.forEach(p=>{
-        console.log(p);
         total += p.quantity * p.productId.price;
        });
       
@@ -162,7 +160,8 @@ exports.getCheckout = (req, res, next) =>{
           pageTitle: 'Checkout',
           products: products,
           totalSum: total,
-          client_secret: clientId
+          client_secret: clientId,
+          email: req.user.email
         });
       })
       .catch(err=>console.log(err));
@@ -176,11 +175,11 @@ exports.getCheckout = (req, res, next) =>{
 
 exports.postOrder = (req, res, next) => {
   let totalSum = 0;
-
+  
   req.user
-    .populate('cart.items.productId')
-    .execPopulate()
-    .then(user => {
+  .populate('cart.items.productId')
+  .execPopulate()
+  .then(user => {
       user.cart.items.forEach(p=>{
         totalSum += p.quantity * p.productId.price;
       });
@@ -194,39 +193,10 @@ exports.postOrder = (req, res, next) => {
         },
         products: products
       });
-      order.save();
+      return order.save();
       })
       .then(result => {
-        console.log('Result stripe',result)
-        const clientSecret = document.getElementById('payment-form').dataset.client_secret;
-        stripe.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: card,
-            billing_details: {
-              email: req.user.email,
-              amount: total * 100,
-              currency: 'usd',
-              description: 'User confirms the payment',
-              // Verify your integration in this guide by including this parameter
-              metadata: {integration_check: 'accept_a_payment'},
-            },
-          }
-        }).then(function(result) {
-          if (result.error) {
-            // Show error to your customer (e.g., insufficient funds)
-            console.log(result.error.message);
-          } else {
-            // The payment has been processed!
-            if (result.paymentIntent.status === 'succeeded') {
-              // Show a success message to your customer
-              // There's a risk of the customer closing the window before callback
-              // execution. Set up a webhook or plugin to listen for the
-              // payment_intent.succeeded event that handles any business critical
-              // post-payment actions.
-            }
-          }
-        }).catch(err=>console.log(err));
-      return req.user.clearCart();
+        return req.user.clearCart();
     })
     .then(()=>{
       res.redirect('/orders');

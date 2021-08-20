@@ -82,7 +82,6 @@ app.use((req, res, next) => {
     });
 });
 
-
 app.post('/create-order', isAuth, shopController.postOrder);
 
 app.use(csrfProtection);

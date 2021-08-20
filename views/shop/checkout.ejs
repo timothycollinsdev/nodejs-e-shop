@@ -20,7 +20,7 @@
             <h2>
                 Total: <%= totalSum %>
             </h2>
-            <form id="payment-form" data-secret="<%= client_secret %>" action="/create-order" method="POST">
+            <form id="payment-form" data-secret="<%= client_secret + "=" + email + "=" + totalSum %>" action="/create-order" method="POST">
                 <div id="card-element">
                   <!-- Elements will create input elements here -->
                   <script src="/js/checkout.js"></script>
