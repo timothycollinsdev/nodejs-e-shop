@@ -23,8 +23,10 @@ card.on('change', ({error}) => {
 
 var form = document.getElementById('payment-form');
 
-if(!checkError){
 form.addEventListener('submit', function(ev) {
+  if(checkError){
+    return ev.preventDefault(); 
+  }
   let dataset = form.dataset.secret.split("=");
   const clientSecret = dataset[0];
   const userEmail = dataset[1];
@@ -58,4 +60,3 @@ form.addEventListener('submit', function(ev) {
     }
   }).catch(err=>console.log(err));
 });
-}
