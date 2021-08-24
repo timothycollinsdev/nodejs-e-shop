@@ -39,7 +39,7 @@ form.addEventListener('submit', function(ev) {
         name: userEmail,
       },
       // Verify your integration in this guide by including this parameter
-      metadata: {integration_check: 'accept_a_payment', amount: totalSum * 100, currency: 'usd', description: 'User confirms the payment'},
+      metadata: {integration_check: 'accept_a_payment', amount: totalSum * 100, currency: 'usd', description: 'Congrats, User confirms the payment'},
     }
   }).then(function(result) {
     if (result.error) {
